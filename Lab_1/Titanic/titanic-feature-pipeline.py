@@ -1,5 +1,6 @@
 import os
 import modal
+from preprocess_titanic import run_preprocess
     
 LOCAL=False
 
@@ -17,13 +18,14 @@ def g():
 
     project = hopsworks.login()
     fs = project.get_feature_store()
-    iris_df = pd.read_csv("https://repo.hops.works/master/hopsworks-tutorials/data/iris.csv")
-    iris_fg = fs.get_or_create_feature_group(
-        name="iris_modal",
+    titanic_df = run_preprocess()
+    titanic_fg = fs.get_or_create_feature_group(
+        name="titanic_modal",
         version=1,
-        primary_key=["sepal_length","sepal_width","petal_length","petal_width"], 
-        description="Iris flower dataset")
-    iris_fg.insert(iris_df, write_options={"wait_for_job" : False})
+        primary_key=['sex','age','sibsp','parch','fare','embarked_c','embarked_q','embarked_s',
+                     'pclass_1','pclass_2','pclass_3',''],
+        description="Titanic dataset")
+    titanic_fg.insert(titanic_df, write_options={"wait_for_job" : False})
 
 if __name__ == "__main__":
     if LOCAL == True :
