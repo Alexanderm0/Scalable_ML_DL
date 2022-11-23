@@ -2,7 +2,7 @@
 Projects for the KTH course ID2223 Scalable Machine Learning &amp; Deep Learning.
 
 In this project we created a complete machine learning pipeline in serverless mode. 
-In this way the pipeline was divided in different steps: Feature generation, Training, Batch Inference. 
+In this way the pipeline was divided in different steps: Features generation, Training, Batch Inference. 
 
 ![image](https://user-images.githubusercontent.com/53121540/203356492-745747e2-527b-4d9e-a1f1-932dbd3ab184.png)
 
