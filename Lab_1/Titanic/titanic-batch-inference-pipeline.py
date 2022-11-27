@@ -37,12 +37,27 @@ def g():
     y_pred = model.predict(batch_data)
     # print(y_pred)
     survival = y_pred[y_pred.size-1]
+    if survival == 1:
+       image_url = "https://i.ibb.co/0X0JTcx/survive.jpg"
+    else:
+       image_url = "https://i.ibb.co/C8SdRn2/drowning.jpg"
+    img = Image.open(requests.get(image_url, stream=True).raw)            
+    img.save("./latest_passenger.png")
+    dataset_api = project.get_dataset_api()    
+    dataset_api.upload("./latest_passenger.png", "Resources/images", overwrite=True)
     
     titanic_fg = fs.get_feature_group(name="titanic_modal", version=1)
     df = titanic_fg.read()
     # print(df)
     label = df.iloc[-1]["survived"]
     print("Survival actual: " + str(label))
+    if label == 1:
+       image_url = "https://i.ibb.co/0X0JTcx/survive.jpg"
+    else:
+       image_url = "https://i.ibb.co/C8SdRn2/drowning.jpg"
+    img = Image.open(requests.get(image_url, stream=True).raw)            
+    img.save("./actual_passenger.png") 
+    dataset_api.upload("./actual_passenger.png", "Resources/images", overwrite=True)
 
     monitor_fg = fs.get_or_create_feature_group(name="titanic_predictions",
                                                 version=1,
@@ -67,27 +82,21 @@ def g():
 
     df_recent = history_df.tail(5)
     dfi.export(df_recent, './df_recent.png', table_conversion = 'matplotlib')
-    dataset_api = project.get_dataset_api()
     dataset_api.upload("./df_recent.png", "Resources/images", overwrite=True)
     
     predictions = history_df[['prediction']]
     labels = history_df[['label']]
 
-    # Only create the confusion matrix when our iris_predictions feature group has examples of all 3 iris flowers
-    print("Number of different flower predictions to date: " + str(predictions.value_counts().count()))
-    if predictions.value_counts().count() == 3:
-        results = confusion_matrix(labels, predictions)
     
-        df_cm = pd.DataFrame(results, ['True Survival', 'True Death'],
-                             ['Pred Survival', 'Pred Death'])
+    #generation of confusion matrix
+    results = confusion_matrix(labels, predictions)
+    df_cm = pd.DataFrame(results, ['True Survival', 'True Death'],
+                            ['Pred Survival', 'Pred Death'])
+    cm = sns.heatmap(df_cm, annot=True)
+    fig = cm.get_figure()
+    fig.savefig("./confusion_matrix.png")
+    dataset_api.upload("./confusion_matrix.png", "Resources/images", overwrite=True)
     
-        cm = sns.heatmap(df_cm, annot=True)
-        fig = cm.get_figure()
-        fig.savefig("./confusion_matrix.png")
-        dataset_api.upload("./confusion_matrix.png", "Resources/images", overwrite=True)
-    else:
-        print("You need 3 different flower predictions to create the confusion matrix.")
-        print("Run the batch inference pipeline more times until you get 3 different iris flower predictions") 
 
 
 if __name__ == "__main__":

@@ -61,7 +61,7 @@ def g():
     import hopsworks
     import pandas as pd
 
-    project = hopsworks.login()
+    project = hopsworks.login(api_key_value="3iG2VIJVq2uuEjxu.pCmzotAAAzGqUJEeJNfgsvuXMJDzjciEJOCgjOs5tqSpBJbJ6FPM1DAadY42mrlD")
     fs = project.get_feature_store()
 
     if BACKFILL == True:
